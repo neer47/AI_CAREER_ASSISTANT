@@ -1,4 +1,4 @@
-# AURA Chatbot
+# AI_CAREER_ASSISTANT
 
 A full-stack chatbot application built using the MERN stack (MongoDB, Express, React, Node.js) that integrates with the OpenAI API for chat completion. This project features user authentication, a dynamic chat interface, and state management via the Context API.
 
