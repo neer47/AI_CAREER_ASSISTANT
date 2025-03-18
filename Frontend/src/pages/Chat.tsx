@@ -1,17 +1,12 @@
-//chat.tsx
-
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { IoMdSend } from "react-icons/io";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
-import FileUpload from "../components/interview/FileUpload";
 import ChatItem from "../components/chat/ChatItem";
 import {
   deleteUserChats,
-  generateResumeQuestions,
   getUserChats,
   sendChatRequest,
-  submitInterviewAnswer,
 } from "../helpers/api-communicator";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -19,14 +14,6 @@ import { useNavigate } from "react-router-dom";
 type Message = {
   role: "user" | "assistant";
   content: string;
-};
-
-type InterviewQuestion = {
-  id: string;
-  question: string;
-  answer?: string;
-  feedback?: string;
-  rating?: number;
 };
 
 const Chat = () => {
@@ -37,13 +24,6 @@ const Chat = () => {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   // const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInterviewMode, setIsInterviewMode] = useState(false);
-  const [interviewQuestions, setInterviewQuestions] = useState<
-    InterviewQuestion[]
-  >([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswer, setUserAnswer] = useState("");
   const recognition = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
@@ -95,53 +75,27 @@ const Chat = () => {
     }
   }, [auth, navigate]);
 
+
   const handleSubmit = async () => {
-    if (isInterviewMode) {
-      // Handle interview answer submission
-      const currentQuestion = interviewQuestions[currentQuestionIndex];
-      try {
-        setIsLoading(true);
-        const { feedback } = await submitInterviewAnswer(
-          currentQuestion.id,
-          userAnswer
-        );
+    const content = inputRef.current?.value.trim();
+    if (!content) {
+      toast.error("Message cannot be empty!");
+      return;
+    }
 
-        setInterviewQuestions((prev) =>
-          prev.map((q) =>
-            q.id === currentQuestion.id
-              ? { ...q, feedback, answer: userAnswer }
-              : q
-          )
-        );
+    if (inputRef.current) inputRef.current.value = "";
+    const newMessage: Message = { role: "user", content };
+    setChatMessages((prev) => [...prev, newMessage]);
 
-        if (currentQuestionIndex < interviewQuestions.length - 1) {
-          setCurrentQuestionIndex((prev) => prev + 1);
-        }
-        setUserAnswer("");
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      const content = inputRef.current?.value.trim();
-      if (!content) {
-        toast.error("Message cannot be empty!");
-        return;
-      }
-
-      if (inputRef.current) inputRef.current.value = "";
-      const newMessage: Message = { role: "user", content };
-      setChatMessages((prev) => [...prev, newMessage]);
-
-      try {
-        const chatData = await sendChatRequest(content);
-        setChatMessages([...chatData.chats]);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to send message");
-      }
+    try {
+      const chatData = await sendChatRequest(content);
+      setChatMessages([...chatData.chats]);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send message");
     }
   };
-
+  
   const toggleListening = () => {
     if (isListening) {
       recognition.current?.stop();
@@ -163,16 +117,6 @@ const Chat = () => {
     }
   };
 
-  const handleUploadComplete = async (resumeText: string) => {
-    try {
-      setIsInterviewMode(true);
-      setIsLoading(true);
-      const { questions } = await generateResumeQuestions(resumeText);
-      setInterviewQuestions(questions.slice(0, 10));
-    } catch (error) {
-      toast.error("Failed to generate questions");
-    }
-  };
 
   return (
     <div className="flex h-[90vh] bg-gray-900 text-white">
@@ -187,12 +131,6 @@ const Chat = () => {
         <p className="text-sm text-gray-400 mb-6 text-center">
           Ask questions or get resume feedback.
         </p>
-        {isLoading && (
-          <div className="w-full bg-blue-500 text-white text-center py-2">
-            Loading...
-          </div>
-        )}
-        <FileUpload onUploadComplete={handleUploadComplete} />
         <button
           onClick={handleDeleteChats}
           className="mt-auto py-2 px-4 bg-red-500 hover:bg-red-600 rounded-lg text-white"
@@ -206,27 +144,10 @@ const Chat = () => {
           Model - GPT-4o
         </h2>
         <div className="flex-1 overflow-y-auto px-2 py-4">
-          {isInterviewMode
-            ? interviewQuestions.map((q, index) => (
-                <div
-                  key={q.id}
-                  className={`${
-                    index === currentQuestionIndex ? "bg-gray-700" : ""
-                  }`}
-                >
-                  <ChatItem content={q.question} role="assistant" />
-                  {q.answer && (
-                    <ChatItem
-                      content={`Answer: ${q.answer}\nFeedback: ${q.feedback}`}
-                      role="user"
-                    />
-                  )}
-                </div>
-              ))
-            : chatMessages.map((chat, index) => (
-                <ChatItem content={chat.content} role={chat.role} key={index} />
-              ))}
-          <div ref={messagesEndRef} />
+          {chatMessages.map((chat, index) => (
+            <ChatItem content={chat.content} role={chat.role} key={index} />
+          ))}
+          <div ref={messagesEndRef}></div>
         </div>
         <div className="flex items-center bg-gray-800 rounded-lg p-2 shadow-md mb-4">
           <button
@@ -243,10 +164,7 @@ const Chat = () => {
             placeholder="Type or speak your message..."
             className="flex-1 bg-transparent text-white placeholder-gray-400 px-4 py-2 outline-none"
           />
-          <button
-            className="p-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg"
-            onClick={handleSubmit}
-          >
+          <button className="p-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg" onClick={handleSubmit}>
             <IoMdSend size={24} />
           </button>
         </div>
