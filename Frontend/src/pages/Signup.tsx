@@ -16,19 +16,20 @@ const Signup = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    // Check if the name contains at least two words
     if (!name || name.trim().split(" ").length < 2) {
-      toast.error("Please enter your full name (first and last name).");
-      return; // Stop execution if validation fails
+      toast.error("Please enter your full name (first and last name).", {
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
+      return;
     }
 
     try {
-      toast.loading("Signing Up...", { id: "signup" });
+      toast.loading("Signing Up...", { id: "signup", style: { background: "#2D3748", color: "#E2E8F0" } });
       await auth?.signup(name, email, password);
-      toast.success("Sign Up Successful!", { id: "signup" });
+      toast.success("Sign Up Successful!", { id: "signup", style: { background: "#2D3748", color: "#E2E8F0" } });
     } catch (error) {
       console.error(error);
-      toast.error("Signing Up Failed", { id: "signup" });
+      toast.error("Signing Up Failed", { id: "signup", style: { background: "#2D3748", color: "#E2E8F0" } });
     }
   };
 
@@ -39,72 +40,46 @@ const Signup = () => {
   }, [auth?.user, navigate]);
 
   return (
-    <div className="flex items-center justify-center ">
-      {/* Container */}
-      <div className="w-full max-w-md px-8 py-10 bg-[#0a1a2e] text-white rounded-lg shadow-2xl">
-        {/* Header */}
-        <h1 className="text-center text-3xl font-bold mb-8 text-cyan-400">
+    <div className="flex-1 flex items-center justify-center px-6 py-4 ">
+      <div className="w-full max-w-md px-6 py-8 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl border border-indigo-500/30">
+        <h1 className="text-center text-3xl font-bold mb-6 text-purple-300 tracking-tight">
           Create Your Account
         </h1>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Input */}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col">
-            <label htmlFor="name" className="text-gray-300 mb-2 text-sm">
+            <label htmlFor="name" className="text-gray-300 mb-1 text-sm">
               Full Name
             </label>
-            <CustomizedInput
-              type="text"
-              name="name"
-              label=""
-            />
+            <CustomizedInput type="text" name="name" label="" />
           </div>
-
-          {/* Email Input */}
           <div className="flex flex-col">
-            <label htmlFor="email" className="text-gray-300 mb-2 text-sm">
+            <label htmlFor="email" className="text-gray-300 mb-1 text-sm">
               Email Address
             </label>
-            <CustomizedInput
-              type="email"
-              name="email"
-              label=""
-            />
+            <CustomizedInput type="email" name="email" label="" />
           </div>
-
-          {/* Password Input */}
           <div className="flex flex-col">
-            <label htmlFor="password" className="text-gray-300 mb-2 text-sm">
+            <label htmlFor="password" className="text-gray-300 mb-1 text-sm">
               Password
             </label>
-            <CustomizedInput
-              type="password"
-              name="password"
-              label=""
-            />
+            <CustomizedInput type="password" name="password" label="" />
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 rounded-lg transition duration-300 flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-2.5 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
           >
             Signup
-            <IoIosLogIn className="ml-2" />
+            <IoIosLogIn size={20} />
           </button>
         </form>
-
-        {/* Divider */}
-        <div className="my-6 flex items-center justify-center">
-          <hr className="border-t border-gray-600 w-full" />
+        <div className="my-4 flex items-center justify-center">
+          <hr className="border-t border-indigo-500/50 w-full" />
           <span className="mx-4 text-gray-400 text-sm">OR</span>
-          <hr className="border-t border-gray-600 w-full" />
+          <hr className="border-t border-indigo-500/50 w-full" />
         </div>
-
-        {/* Bottom Section */}
         <p className="text-center text-gray-400 text-sm">
           Already have an account?{" "}
-          <a href="/login" className="text-cyan-400 hover:underline">
+          <a href="/login" className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
             Login
           </a>
         </p>

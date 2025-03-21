@@ -7,7 +7,7 @@ export default {
     extend: {
       fontFamily: {
         'roboto-slab': ['Roboto Slab', 'serif'],
-      },
+      }
     },
   },
   plugins: [],
