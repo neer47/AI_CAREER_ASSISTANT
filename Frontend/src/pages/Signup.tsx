@@ -24,12 +24,21 @@ const Signup = () => {
     }
 
     try {
-      toast.loading("Signing Up...", { id: "signup", style: { background: "#2D3748", color: "#E2E8F0" } });
+      toast.loading("Signing Up...", {
+        id: "signup",
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
       await auth?.signup(name, email, password);
-      toast.success("Sign Up Successful!", { id: "signup", style: { background: "#2D3748", color: "#E2E8F0" } });
+      toast.success("Sign Up Successful!", {
+        id: "signup",
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
     } catch (error) {
       console.error(error);
-      toast.error("Signing Up Failed", { id: "signup", style: { background: "#2D3748", color: "#E2E8F0" } });
+      toast.error("Signing Up Failed", {
+        id: "signup",
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
     }
   };
 
@@ -79,7 +88,10 @@ const Signup = () => {
         </div>
         <p className="text-center text-gray-400 text-sm">
           Already have an account?{" "}
-          <a href="/login" className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
+          <a
+            href="/login"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
+          >
             Login
           </a>
         </p>

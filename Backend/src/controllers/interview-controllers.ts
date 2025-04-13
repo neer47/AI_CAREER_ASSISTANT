@@ -12,10 +12,11 @@ export const startInterview = async (req: Request, res: Response) => {
     const user = await User.findById(res.locals.jwtData.id);
     if (!user) {
       return res
-        .status(401)
-        .json({ message: "User not found or unauthorized" });
+      .status(401)
+      .json({ message: "User not found or unauthorized" });
     }
-
+    
+    console.log("Entering startInterview, req.file:", req.file);
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }

@@ -1,15 +1,21 @@
 import axios from "axios";
 
-type Message = {
-    role: "user" | "assistant";
-    content: string;
-  };
-  
-  type Interview = {
-    id: string;
-    date: string;
-    preview: string;
-  };
+export type Message = { role: "user" | "assistant"; content: string };
+
+export type Question = {
+  _id?: string;
+  question: string;
+  userAnswer: string;
+  expectedAnswer: string;
+  rating: number | null;
+};
+
+export type Interview = {
+  id: string;
+  date: string;
+  preview: string;
+  questions?: Question[];
+};
 
 export const signupUser = async (
   name: string,
@@ -78,48 +84,59 @@ export const logoutUser = async () => {
   return data;
 };
 
-export const getAnswerFeedback = async (question: string, answer: string) => {
-  const response = await fetch("/get-feedback", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question, answer }),
-  });
-  return response.json();
+export const getInterviews = async (): Promise<{ interviews: Interview[] }> => {
+  const res = await axios.get("/interview/all", { withCredentials: true });
+  if (res.status !== 200) throw new Error("Unable to get interviews");
+  const interviews = res.data.map((interview: any) => ({
+    id: interview._id.toString(),
+    date: interview.createdAt || new Date().toISOString(),
+    preview: interview.questions[0]?.question.slice(0, 50) || "Interview",
+    questions: interview.questions.map((q: any) => ({
+      _id: q._id.toString(),
+      question: q.question,
+      userAnswer: q.userAnswer,
+      expectedAnswer: q.expectedAnswer,
+      rating: q.rating,
+    })),
+  }));
+  return { interviews };
 };
 
-export const generateResumeQuestions = async (resumeText: string) => {
-  const response = await axios.post("/interview/generate-questions", {
-    resumeText,
+export const startNewInterview = async (resumeFile?: File): Promise<{ interviewId: string; messages: Message[] }> => {
+  const formData = new FormData();
+  if (resumeFile) formData.append("pdfFile", resumeFile);
+  const res = await axios.post("/interview/start", resumeFile ? formData : {}, {
+    headers: resumeFile ? { "Content-Type": "multipart/form-data" } : {},
+    withCredentials: true,
   });
-  return response.data;
+  if (res.status !== 200) throw new Error("Unable to start interview");
+  return res.data;
 };
 
 export const submitInterviewAnswer = async (
+  interviewId: string,
   questionId: string,
-  answer: string
-) => {
-  const response = await axios.post("/interview/answer", {
-    questionId,
-    answer,
-  });
-  return response.data;
-};
-
-// Add these to your existing API functions
-export const getInterviews = async (): Promise<{ interviews: Interview[] }> => {
-  const response = await axios.get("/interview", { withCredentials: true });
-  return response.data;
-};
-
-export const deleteInterviews = async (): Promise<void> => {
-  await axios.delete("/interview", { withCredentials: true });
-};
-
-export const getInterviewMessages = async (
-  interviewId: string
+  userAnswer: string
 ): Promise<{ messages: Message[] }> => {
-  const response = await axios.get(`/interview/${interviewId}`, {
-    withCredentials: true,
-  });
-  return response.data;
+  const res = await axios.post(
+    "/interview/submit",
+    { interviewId, questionId, userAnswer },
+    { withCredentials: true }
+  );
+  if (res.status !== 200) throw new Error("Unable to submit answer");
+  return res.data;
+};
+
+export const deleteInterview = async (interviewId: string): Promise<void> => {
+  const res = await axios.delete(`/interview/delete/${interviewId}`, { withCredentials: true });
+  if (res.status !== 200) throw new Error("Unable to delete interview");
+};
+
+export const getAnswerFeedback = async (question: string, answer: string) => {
+  const res = await axios.post(
+    "/api/get-feedback",
+    { question, answer },
+    { headers: { "Content-Type": "application/json" }, withCredentials: true }
+  );
+  return res.data;
 };

@@ -16,12 +16,21 @@ const Login = () => {
     const password = formData.get("password") as string;
 
     try {
-      toast.loading("Signing In", { id: "login", style: { background: "#2D3748", color: "#E2E8F0" } });
+      toast.loading("Signing In", {
+        id: "login",
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
       await auth?.login(email, password);
-      toast.success("Login Successful", { id: "login", style: { background: "#2D3748", color: "#E2E8F0" } });
+      toast.success("Login Successful", {
+        id: "login",
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
     } catch (error) {
       console.log(error);
-      toast.error("Signing In Failed", { id: "login", style: { background: "#2D3748", color: "#E2E8F0" } });
+      toast.error("Signing In Failed", {
+        id: "login",
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
     }
   };
 
@@ -66,7 +75,10 @@ const Login = () => {
         </div>
         <p className="text-center text-gray-400 text-sm">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
+          <a
+            href="/signup"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
+          >
             Sign Up
           </a>
         </p>
