@@ -11,7 +11,7 @@ import cors from "cors";
 const app = express();
 
 // Middlewares
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: process.env.PROD_CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
@@ -21,6 +21,11 @@ connect();
 app.use("/api/v1", appRouter);
 
 const PORT = process.env.PORT || 5000;
+
+app.get("/", (req, res) => {
+  res.send("✅ Server is up and running!");
+});
+
 app.listen(PORT, () => {
   console.log(`Server started running on port no. ${PORT}!`);
 });
