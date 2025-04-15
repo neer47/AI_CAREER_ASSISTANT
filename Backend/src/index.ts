@@ -21,6 +21,11 @@ connect();
 app.use("/api/v1", appRouter);
 
 const PORT = process.env.PORT || 5000;
+
+app.get("/", (req, res) => {
+  res.send("✅ Server is up and running!");
+});
+
 app.listen(PORT, () => {
   console.log(`Server started running on port no. ${PORT}!`);
 });
