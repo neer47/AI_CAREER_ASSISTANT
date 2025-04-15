@@ -1,4 +1,4 @@
-// src/types/speech.d.ts or vite-env.d.ts
+/// <reference types="vite/client" />
 
 export {};
 
@@ -14,4 +14,12 @@ declare global {
   type SpeechRecognitionEvent = Event & {
     results: SpeechRecognitionResultList;
   };
+}
+
+interface ImportMetaEnv {
+  VITE_API_URL: string; // Add other environment variables as needed
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }
