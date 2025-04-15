@@ -6,8 +6,8 @@ import { BrowserRouter } from "react-router-dom";
 import { Toaster } from 'react-hot-toast';
 import axios from 'axios'
 import { AuthProvider } from "./context/AuthContext.tsx";
-console.log(import.meta.env.VITE_API_URL)
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+
+axios.defaults.baseURL = "http://localhost:5000/api/v1";
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById('root')!).render(
