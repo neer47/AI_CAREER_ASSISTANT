@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC, useRef, useState, useEffect } from "react";
 import { IoMdSend } from "react-icons/io";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
@@ -8,15 +8,20 @@ interface MessageInputProps {
   placeholder?: string;
 }
 
-const MessageInput: FC<MessageInputProps> = ({ onSubmit, placeholder = "Type or speak your message..." }) => {
+const MessageInput: FC<MessageInputProps> = ({
+  onSubmit,
+  placeholder = "Type or speak your message...",
+}) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const recognition = useRef<SpeechRecognition | null>(null);
+  const recognition = useRef<typeof SpeechRecognition | null>(null);
 
-  useState(() => {
-    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition.current = new SpeechRecognition();
+  useEffect(() => {
+    const SpeechRecognitionClass =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognitionClass) {
+      recognition.current = new SpeechRecognitionClass();
       recognition.current.continuous = false;
       recognition.current.interimResults = false;
 
@@ -32,12 +37,17 @@ const MessageInput: FC<MessageInputProps> = ({ onSubmit, placeholder = "Type or 
           style: { background: "#2D3748", color: "#E2E8F0" },
         });
       };
+    } else {
+      toast.error("Speech recognition is not supported in this browser", {
+        style: { background: "#2D3748", color: "#E2E8F0" },
+      });
     }
-  });
+  }, []);
 
   const toggleListening = () => {
-    if (isListening) recognition.current?.stop();
-    else recognition.current?.start();
+    if (!recognition.current) return;
+    if (isListening) recognition.current.stop();
+    else recognition.current.start();
     setIsListening(!isListening);
   };
 
