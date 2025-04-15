@@ -1,10 +1,17 @@
-/// <reference types="vite/client" />
+// src/types/speech.d.ts or vite-env.d.ts
+
+export {};
 
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
   }
-}
 
-export {};
+  var webkitSpeechRecognition: any;
+  var SpeechRecognition: any;
+
+  type SpeechRecognitionEvent = Event & {
+    results: SpeechRecognitionResultList;
+  };
+}
