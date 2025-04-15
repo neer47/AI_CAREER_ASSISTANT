@@ -9,7 +9,14 @@ const upload = multer({ storage: storage });
 const interviewRoutes = Router();
 
 // Start a new interview (generate questions using OpenAI)
-interviewRoutes.post("/start", verifyToken, upload.single("pdfFile"), startInterview);
+interviewRoutes.post("/start", verifyToken, (req, res, next) => {
+    console.log("Request body:", req.body);  // Should be empty or minimal
+    console.log("Request file:", req.file);  // Should be undefined here
+    next();
+  }, upload.single("pdfFile"), (req, res, next) => {
+    console.log("After multer - Request file:", req.file);  // Should show file details
+    next();
+  }, startInterview);
 
 // Submit an answer (evaluate, rate, and generate expected answer)
 interviewRoutes.post("/submit", validate(interviewValidator), verifyToken, submitAnswer);
@@ -18,6 +25,6 @@ interviewRoutes.post("/submit", validate(interviewValidator), verifyToken, submi
 interviewRoutes.get("/all", verifyToken, getInterviews);
 
 // Delete an interview session
-interviewRoutes.delete("/delete/:interviewId", validate(interviewValidator), verifyToken, deleteInterview);
+interviewRoutes.delete("/delete/:interviewId", verifyToken, deleteInterview);
 
 export default interviewRoutes;
