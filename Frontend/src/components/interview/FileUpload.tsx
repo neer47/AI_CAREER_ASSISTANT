@@ -13,6 +13,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       acceptedFileTypes={["application/pdf"]}
       labelIdle='Drag & Drop your resume or <span class="filepond--label-action">Browse</span>'
       server={{
+        // @ts-ignore
         process: async (fieldName, file, metadata, load, error) => {
           try {
             console.log("Uploading file:", file.name, file.type);

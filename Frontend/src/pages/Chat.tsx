@@ -6,6 +6,7 @@ import Sidebar from "../components/shared/Sidebar";
 import MessageInput from "../components/shared/MessageInput";
 import { deleteUserChats, getUserChats, sendChatRequest } from "../helpers/api-communicator";
 import toast from "react-hot-toast";
+import { FaBars } from "react-icons/fa"; // Hamburger icon
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -14,6 +15,7 @@ const Chat = () => {
   const auth = useAuth();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -80,9 +82,23 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-60px)] bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950 text-white">
-      <Sidebar onClear={handleDeleteChats} clearLabel="Clear Chat" />
-      <main className="flex-1 flex flex-col">
+    <div className="flex h-[calc(100vh-64px)] bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950 text-white overflow-hidden">
+      {/* Toggle Button for Small Screens */}
+      <button
+        className="md:hidden p-4 text-white bg-gray-800/70 z-50 fixed top-0 left-0"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        <FaBars size={24} />
+      </button>
+
+      {/* Sidebar */}
+      <Sidebar
+        onClear={handleDeleteChats}
+        clearLabel="Clear Chat"
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
+      <main className="flex-1 flex flex-col transition-all duration-300">
         <div className="flex items-center justify-between py-3 px-6 bg-gray-800/70 shadow-xl border-b border-indigo-500/30">
           <h2 className="text-2xl font-bold text-purple-300 tracking-tight">General Chat</h2>
           <button

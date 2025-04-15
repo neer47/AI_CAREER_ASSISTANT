@@ -3,7 +3,7 @@ import axios from "axios";
 export type Message = { role: "user" | "assistant"; content: string };
 
 export type Question = {
-  _id?: string;
+  _id: string;
   question: string;
   userAnswer: string;
   expectedAnswer: string;
@@ -102,7 +102,9 @@ export const getInterviews = async (): Promise<{ interviews: Interview[] }> => {
   return { interviews };
 };
 
-export const startNewInterview = async (resumeFile?: File): Promise<{ interviewId: string; messages: Message[] }> => {
+export const startNewInterview = async (
+  resumeFile?: File
+): Promise<{ interviewId: string; questions: Question[] }> => {
   const formData = new FormData();
   if (resumeFile) formData.append("pdfFile", resumeFile);
   const res = await axios.post("/interview/start", resumeFile ? formData : {}, {
@@ -110,14 +112,24 @@ export const startNewInterview = async (resumeFile?: File): Promise<{ interviewI
     withCredentials: true,
   });
   if (res.status !== 200) throw new Error("Unable to start interview");
-  return res.data;
+
+  // Ensure the response matches the expected type
+  const { interviewId, questions } = res.data;
+  return { interviewId, questions }; // No transformation needed
 };
 
 export const submitInterviewAnswer = async (
   interviewId: string,
   questionId: string,
   userAnswer: string
-): Promise<{ messages: Message[] }> => {
+): Promise<{
+  message: string;
+  updatedQuestion: {
+    userAnswer: string;
+    expectedAnswer: string;
+    rating: number | null;
+  };
+}> => {
   const res = await axios.post(
     "/interview/submit",
     { interviewId, questionId, userAnswer },
@@ -128,15 +140,8 @@ export const submitInterviewAnswer = async (
 };
 
 export const deleteInterview = async (interviewId: string): Promise<void> => {
-  const res = await axios.delete(`/interview/delete/${interviewId}`, { withCredentials: true });
+  const res = await axios.delete(`/interview/delete/${interviewId}`, {
+    withCredentials: true,
+  });
   if (res.status !== 200) throw new Error("Unable to delete interview");
-};
-
-export const getAnswerFeedback = async (question: string, answer: string) => {
-  const res = await axios.post(
-    "/api/get-feedback",
-    { question, answer },
-    { headers: { "Content-Type": "application/json" }, withCredentials: true }
-  );
-  return res.data;
 };

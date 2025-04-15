@@ -127,9 +127,8 @@ export const submitAnswer = async (req: Request, res: Response) => {
     const aiResponse = response.choices[0].message.content.split("\n");
     console.log(response.choices[0].message.content);
     const expectedAnswer =
-      aiResponse[0]?.replace("Expected Answer:", "").trim() ||
-      "No expected answer provided.";
-    const rating = parseInt(aiResponse[1]?.replace("Rating:", "").trim()) || 0;
+      aiResponse[0]?.replace("Expected Answer:", "").trim() || "No expected answer provided.";
+    const rating = parseInt(aiResponse[2]?.replace("Rating:", "").trim()) || 0;
     console.log("the expected Answer:", expectedAnswer);
     console.log("the rating:", rating);
     // Update the question in the database
