@@ -146,34 +146,39 @@ export const userLogin = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-export const userLogout = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      //user token check
-      const user = await User.findById(res.locals.jwtData.id);
-      if (!user) {
-        return res.status(401).send("User not registered OR Token malfunctioned");
-      }
-      if (user._id.toString() !== res.locals.jwtData.id) {
-        return res.status(401).send("Permissions didn't match");
-      }
-      res.clearCookie(COOKIE_NAME, {
-        httpOnly: true,
-        domain: "localhost",
-        signed: true,
-        path: "/",
-      });
-      return res
-        .status(200)
-        .json({ message: "OK", name: user.name, email: user.email });
-    } catch (error) {
-      console.log(error);
-      return res.status(200).json({ message: "ERROR", cause: error.message });
+export const userLogout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // User token check
+    const user = await User.findById(res.locals.jwtData.id);
+    if (!user) {
+      return res.status(401).send("User not registered OR Token malfunctioned");
     }
-  };
+    if (user._id.toString() !== res.locals.jwtData.id) {
+      return res.status(401).send("Permissions didn't match");
+    }
+
+    // Clear the cookie with production-friendly options
+    res.clearCookie(COOKIE_NAME, {
+      httpOnly: true,
+      path: "/", // Remove domain to default to current host
+      signed: true,
+      secure: process.env.NODE_ENV === "production", // Only secure in production (HTTPS)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cross-origin in production
+    });
+
+    return res.status(200).json({
+      message: "OK",
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    console.log("Logout error:", error);
+    return res.status(500).json({ // Changed to 500 for server error
+      message: "ERROR",
+      cause: error.message,
+    });
+  }
+};
 
 export const verifyUser = async (
     req: Request,
