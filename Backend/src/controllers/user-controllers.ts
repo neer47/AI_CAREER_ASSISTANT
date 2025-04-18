@@ -21,64 +21,67 @@ export const getAllUsers = async (req:Request, res:Response, next:NextFunction) 
     }
 }
 
-export const userSignup = async (req:Request, res:Response, next:NextFunction)=>{
-    try {
-        // fetch details from req body
-        const { name, email, password } = req.body;
-        // Check if user existed or not
-        const existingUser = await User.find({email});
-        console.log("exosting user details: ", existingUser);
-        
-        if(existingUser.length > 0){
-            return res.status(400).json({
-                status: 'false',
-                message: 'User already exists'
-            });
-        }
-        // Encrypt the password
-        const encryptedPassword = await bcrypt.hash(password, 10);
-        // create new user
-        const user = new User({name, email, password: encryptedPassword});
-        // save user in database
-        await user.save();
+export const userSignup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Fetch details from req body
+    const { name, email, password } = req.body;
 
-        // clear  previous cookie
-        res.clearCookie(COOKIE_NAME, {
-            httpOnly: true,
-            domain: "localhost",
-            signed: true,
-            path: "/",
-          });
+    // Check if user exists
+    const existingUser = await User.find({ email });
+    console.log("Existing user details:", existingUser);
 
-        // create token
-        const token = createToken(user._id.toString(), user.email, "7d");
-        // console.log("token is: ", token);
-        
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 7);
-
-        // add cookie in response
-        res.cookie(COOKIE_NAME, token, {
-            httpOnly: true,
-            expires: expires,
-            path:"/",
-            domain:"localhost",
-            signed:true
-        })
-
-        return res.status(200).json({
-            success:true,
-            message:'User is registered Successfully',
-            user
-        });
-    } catch (error) {
-        console.log("Error in signup: ", error);
-        return res.status(400).json({
-            status: 'false',
-            message: error.message
-        })
+    if (existingUser.length > 0) {
+      return res.status(400).json({
+        status: "false",
+        message: "User already exists",
+      });
     }
-}
+
+    // Encrypt the password
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    // Create and save new user
+    const user = new User({ name, email, password: encryptedPassword });
+    await user.save();
+
+    // Clear previous cookie
+    res.clearCookie(COOKIE_NAME, {
+      httpOnly: true,
+      path: "/", // Remove domain to default to current host
+      signed: true,
+    });
+
+    // Create token
+    const token = createToken(user._id.toString(), user.email, "7d");
+    console.log("Generated token:", token);
+
+    // Set cookie with production-friendly options
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 7);
+
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      expires: expires,
+      path: "/",
+      secure: process.env.NODE_ENV === "production", // Only secure in production (HTTPS)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cross-origin in production
+      signed: true,
+    });
+
+    // Return response
+    return res.status(200).json({
+      success: true,
+      message: "User is registered successfully",
+      user: { email: user.email, name: user.name }, // Match frontend expectation
+    });
+  } catch (error) {
+    console.log("Error in signup:", error);
+    return res.status(400).json({
+      status: "false",
+      message: error.message,
+    });
+  }
+};
 
 export const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
