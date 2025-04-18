@@ -80,67 +80,68 @@ export const userSignup = async (req:Request, res:Response, next:NextFunction)=>
     }
 }
 
-export const userLogin = async (req:Request, res:Response, next:NextFunction)=>{
-    try {
-        // fetch details from req body
-        const { email, password } = req.body;
+export const userLogin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Fetch details from req body
+    const { email, password } = req.body;
 
-        // Check if user existed or not
-        const user = await User.findOne({email});
-        console.log("existing user details: ", user);
-        if(!user){
-            return res.status(400).json({
-                status: 'false',
-                message: 'User doesnot exists, Signup first!'
-            });
-        }
-
-        // Compare the password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if(!isMatch){
-            return res.status(400).json({
-                status: 'false',
-                message: 'Invalid password'
-                });
-        }
-        
-        // clear  previous cookie
-        res.clearCookie(COOKIE_NAME, {
-            httpOnly: true,
-            domain: "localhost",
-            signed: true,
-            path: "/",
-          });
-
-        // create token
-        const token = createToken(user._id.toString(), user.email, "7d");
-        // console.log("token is: ", token);
-        
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 7);
-
-        // add cookie in response
-        res.cookie(COOKIE_NAME, token, {
-            httpOnly: true,
-            expires: expires,
-            path:"/",
-            domain:"localhost",
-            signed:true
-        })
-
-        return res.status(200).json({
-            success:true,
-            message:'User login Successfully',
-            user
-        });
-    } catch (error) {
-        console.log("Failed to Login: ", error);
-        return res.status(400).json({
-            status: 'false',
-            message: error.message
-        })
+    // Check if user exists
+    const user = await User.findOne({ email });
+    console.log("Existing user details:", user);
+    if (!user) {
+      return res.status(400).json({
+        status: "false",
+        message: "User does not exist, Signup first!",
+      });
     }
-}
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        status: "false",
+        message: "Invalid password",
+      });
+    }
+
+    // Clear previous cookie
+    res.clearCookie(COOKIE_NAME, {
+      httpOnly: true,
+      path: "/", // Remove domain to default to current host
+      signed: true,
+    });
+
+    // Create token
+    const token = createToken(user._id.toString(), user.email, "7d");
+    console.log("Generated token:", token);
+
+    // Set cookie with production-friendly options
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 7);
+
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      expires: expires,
+      path: "/",
+      secure: process.env.NODE_ENV === "production", // Only secure in production (HTTPS)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cross-origin in production
+      signed: true,
+    });
+
+    // Return response
+    return res.status(200).json({
+      success: true,
+      message: "User login successfully",
+      user: { email: user.email, name: user.name }, // Match frontend expectation
+    });
+  } catch (error) {
+    console.log("Failed to login:", error);
+    return res.status(400).json({
+      status: "false",
+      message: error.message,
+    });
+  }
+};
 
 export const userLogout = async (
     req: Request,
