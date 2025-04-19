@@ -28,9 +28,9 @@ const Home = () => {
         <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400 drop-shadow-lg">
           Ace Your Interviews & Chat Smart
         </h1>
-        <p className="mt-6 text-lg md:text-xl max-w-3xl text-gray-300 leading-relaxed">
+        {/* <p className="mt-6 text-lg md:text-xl max-w-3xl text-gray-300 leading-relaxed">
           Master your interview skills or enjoy seamless conversations with our AI-powered assistant tailored for preparation and productivity.
-        </p>
+        </p> */}
         <div className="mt-12 flex gap-6">
           <button
             onClick={handleChatButtonClick}

@@ -49,54 +49,54 @@ const Signup = () => {
   }, [auth?.user, navigate]);
 
   return (
-    <div className="flex-1 flex items-center justify-center px-6 py-4 ">
-      <div className="w-full max-w-md px-6 py-8 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl border border-indigo-500/30">
-        <h1 className="text-center text-3xl font-bold mb-6 text-purple-300 tracking-tight">
-          Create Your Account
-        </h1>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="flex flex-col">
-            <label htmlFor="name" className="text-gray-300 mb-1 text-sm">
-              Full Name
-            </label>
-            <CustomizedInput type="text" name="name" label="" />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="email" className="text-gray-300 mb-1 text-sm">
-              Email Address
-            </label>
-            <CustomizedInput type="email" name="email" label="" />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="password" className="text-gray-300 mb-1 text-sm">
-              Password
-            </label>
-            <CustomizedInput type="password" name="password" label="" />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-2.5 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
-          >
-            Signup
-            <IoIosLogIn size={20} />
-          </button>
-        </form>
-        <div className="my-4 flex items-center justify-center">
-          <hr className="border-t border-indigo-500/50 w-full" />
-          <span className="mx-4 text-gray-400 text-sm">OR</span>
-          <hr className="border-t border-indigo-500/50 w-full" />
-        </div>
-        <p className="text-center text-gray-400 text-sm">
-          Already have an account?{" "}
-          <a
-            href="/login"
-            className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
-          >
-            Login
-          </a>
-        </p>
+<div className="flex-1 flex items-center justify-center px-4 py-4 sm:px-6 sm:py-6">
+  <div className="w-full max-w-md px-4 py-6 sm:px-6 sm:py-8 bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl border border-indigo-500/30">
+    <h1 className="text-center text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-purple-300 tracking-tight">
+      Create Your Account
+    </h1>
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+      <div className="flex flex-col">
+        <label htmlFor="name" className="text-gray-300 mb-1 text-xs sm:text-sm">
+          Full Name
+        </label>
+        <CustomizedInput type="text" name="name" label="" />
       </div>
+      <div className="flex flex-col">
+        <label htmlFor="email" className="text-gray-300 mb-1 text-xs sm:text-sm">
+          Email Address
+        </label>
+        <CustomizedInput type="email" name="email" label="" />
+      </div>
+      <div className="flex flex-col">
+        <label htmlFor="password" className="text-gray-300 mb-1 text-xs sm:text-sm">
+          Password
+        </label>
+        <CustomizedInput type="password" name="password" label="" />
+      </div>
+      <button
+        type="submit"
+        className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-2 sm:py-2.5 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
+        Signup
+        <IoIosLogIn size={18}/>
+      </button>
+    </form>
+    <div className="my-3 sm:my-4 flex items-center justify-center">
+      <hr className="border-t border-indigo-500/50 w-full" />
+      <span className="mx-2 sm:mx-4 text-gray-400 text-xs sm:text-sm">OR</span>
+      <hr className="border-t border-indigo-500/50 w-full" />
     </div>
+    <p className="text-center text-gray-400 text-xs sm:text-sm">
+      Already have an account?{" "}
+      <a
+        href="/login"
+        className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
+      >
+        Login
+      </a>
+    </p>
+  </div>
+</div>
   );
 };
 
