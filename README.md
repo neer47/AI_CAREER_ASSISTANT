@@ -207,13 +207,3 @@ See the [LICENSE](LICENSE) file for more info.
 
 > ✨ Feel free to star ⭐ the repo if you found this project helpful!
 
-```
-
----
-
-Let me know:
-- If you want to include a **demo video link or GIF**.
-- If your repo has a different structure (`client/` instead of `frontend/` etc.).
-- Or if you're using **GitHub Pages**, **Firebase**, or any other deployment method.
-
-I can update the README accordingly!
